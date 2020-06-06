@@ -19,3 +19,18 @@ I have integrated Jenkins with GitHub:
 Once this is done, each repository containing a `Jenkinsfile` will contain a webhook pointing to our Jenkins, so that whenever a Pull Request is created or updated, two jobs will be automatically created. When finished, a report will be added to the Pull Request in GitHub:
 
 ![alt text](doc/GitHub_jobs_PR.png "GitHub jobs in a Pull Request")
+
+### Tests suites
+I have been reading how to groups of tests, for example based on paths or on `@Tag()`, so that I can tell Maven which suit to run from the command line. I read about `surefire` and `failsafe`, but it took me so long that, since it's not the goal of the exercises, I ended up using a simpler approach.
+
+To simulate a _unit-test_ verification:
+
+```
+mvn -Dtest=es.codeurjc.anuncios.AnuncioTest test
+```
+
+To simulate an _integration-test_ verification:
+
+```
+mvn -Dtest=es.codeurjc.anuncios.AnunciosControllerTest test
+```
