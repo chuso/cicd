@@ -75,4 +75,15 @@
 		</dependency>
 	</dependencies>
 
+	<distributionManagement>
+		<snapshotRepository>
+			<id>nexus-snapshots</id>
+			<url>http://localhost:8082/repository/mvn-snapshots/</url>
+		</snapshotRepository>
+		<repository>
+			<id>nexus-releases</id>
+			<url>http://localhost:8082/repository/mvn-releases/</url>
+		</repository>
+    </distributionManagement>
+
 </project>
