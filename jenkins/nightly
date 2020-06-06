@@ -19,6 +19,11 @@ pipeline {
                 sh 'mvn -Dtest=es.codeurjc.anuncios.AnuncioTest test'
             }
         }
+        stage('Integration Test') {
+            steps {
+                sh 'mvn -Dtest=es.codeurjc.anuncios.AnunciosControllerTest test'
+            }
+        }
     }
     post {
         always {
