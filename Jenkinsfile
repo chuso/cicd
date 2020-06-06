@@ -16,7 +16,8 @@ pipeline {
         }
         stage('Test') {
             steps {
-                sh 'mvn test'
+                build job: 'Jenkins/unit_tests',
+                    propagate: false
             }
         }
     }
