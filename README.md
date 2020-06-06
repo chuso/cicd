@@ -34,3 +34,4 @@ To simulate an _integration-test_ verification:
 ```
 mvn -Dtest=es.codeurjc.anuncios.AnunciosControllerTest test
 ```
+

@@ -16,8 +16,8 @@ pipeline {
         }
         stage('Test') {
             steps {
-                build job: 'Jenkins/unit_tests',
-                    propagate: false
+                sh 'ls Jenkinsfile -l'
+                sh 'pwd'
             }
         }
     }
