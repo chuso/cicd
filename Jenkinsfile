@@ -25,7 +25,7 @@ pipeline {
             junit '**/target/surefire-reports/TEST-*.xml'
         }
         success {
-            archive '**/target/*.jar'
+            sh 'mvn -s $HOME/.m2/settings.xml -DskipTests deploy'
         }
     }
 }
