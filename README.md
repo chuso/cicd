@@ -36,7 +36,11 @@ mvn -Dtest=es.codeurjc.anuncios.AnunciosControllerTest test
 ```
 
 ### Artifacts Repository
-A new installation of Nexus has been used, following the repositories structure suggested in last class: snapshots repository, releases repository and mirror, gathering all of them in a group. The settings are stored in `$HOME/.m2/settings.xml`.
+A new installation of Nexus has been used, following the repositories structure suggested in last class: snapshots repository (`mvn-snapshots`), releases repository (`mvn-releases`) and mirror (`mvn-proxy`), gathering all of them in a group  (`mvn-group`).
+
+In addition, Jenkins is now integrated with the local Nexus using the plugin [Nexus Platform](https://plugins.jenkins.io/nexus-jenkins-plugin/). The credentials to connect to the Nexus are stored directly in Jenkins.
+
+TODO: provide screenshot of the `Sonatype Nexus` section in the settings http://79d0ff5ab2f7.ngrok.io/configure.
 
 This schema -letting Maven publish in Nexus- already provides metadata needed to track which built is associated to a certain artifact. In addition, `git-commit-id-plugin` when building to provide each build with a file `git.properties` with meta info about the commit.
 
