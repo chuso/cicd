@@ -111,3 +111,5 @@ Finally, we have `jenkins/release`, which is executed manually. In addition, it 
 ## Workflow
 
 This project has taken too long to me, so since I ran out of time, I didn't have the chance to figure out on which workflow it would rely (namely, gitflow, TBD, or any specific variation).
+
+Changed introduced for a sample pull request.
