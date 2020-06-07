@@ -1,5 +1,9 @@
 # cicd
 
+Project URL: https://github.com/chuso/cicd
+
+Both @gortazar and @Maes95 have been added as collaborators.
+
 ## Development notes
 
 I have used Jenkins locally directly in my host machine (i.e. it is not running under a container).
