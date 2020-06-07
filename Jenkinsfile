@@ -25,32 +25,7 @@ pipeline {
             junit '**/target/surefire-reports/TEST-*.xml'
         }
         success {
-            script {
-                def version = sh(
-                    script: "mvn -q -Dexec.executable=\"echo\" -Dexec.args='\${project.version}' --non-recursive org.codehaus.mojo:exec-maven-plugin:1.3.1:exec",
-                    returnStdout: true
-                ).trim()
-                def shortversion = sh(
-                    script: "echo '${version}' | sed 's/-.*//'",
-                    returnStdout: true
-                ).trim()
-            }
-            nexusPublisher nexusInstanceId: 'localNexus',
-                nexusRepositoryId: 'mvn-snapshots',
-                packages: [[
-                    $class: 'MavenPackage',
-                    mavenAssetList: [[
-                        classifier: '',
-                        extension: '',
-                        filePath: "target/cicd-0.0.1-SNAPSHOT.jar"
-                    ]],
-                    mavenCoordinate: [
-                        artifactId: 'cicd',
-                        groupId: 'es.urjc.code',
-                        packaging: 'jar',
-                        version: "0.0.1"
-                    ]
-                ]]
+            archive 'target/*.jar'
         }
     }
 }
