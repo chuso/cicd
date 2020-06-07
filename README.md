@@ -1,6 +1,6 @@
 # cicd
 
-Project URL: https://github.com/chuso/cicd
+Project URL: [https://github.com/chuso/cicd](https://github.com/chuso/cicd)
 
 Both @gortazar and @Maes95 have been added as collaborators.
 
@@ -77,6 +77,42 @@ There is a default Job, configured in the `Jenkinsfile` file, which is executed 
 * Archives tests results.
 * Publishes a private SNAPSHOT artifact in Jenkins.
 
+Content of `Jenkinsfile`:
+```
+pipeline {
+    tools {
+        maven 'M3'
+    }
+    agent any
+    stages {
+        stage('Preparation') {
+            steps {
+                git 'https://github.com/chuso/cicd.git'
+            }
+        }
+        stage('Package') {
+            steps {
+                sh 'mvn package -DskipTests'
+            }
+        }
+        stage('Unit Test') {
+            steps {
+                sh 'mvn -Dtest=es.codeurjc.anuncios.AnuncioTest test'
+            }
+        }
+    }
+    post {
+        always {
+            junit '**/target/surefire-reports/TEST-*.xml'
+        }
+        success {
+            archive 'target/*.jar'
+        }
+    }
+}
+
+```
+
 ### Nightly
 
 There is a second Job, configured in `jenkins/nightly`, that is executed every day at 3am according to the server time-zone. This Job is meant to run heavier tasks than those run by the default one, like integration tests or quality analysis. For the sake of simplicity, this project contains just a single integration test which takes around 1 minute, but let's suppose there is a number of integration tests which on average takes half an hour, which would justify having this different job.
@@ -96,6 +132,66 @@ This Job does the following:
 * Archives tests results.
 * Publishes a private NIGHTLY artifact in Jenkins.
 
+
+Content of `jenkins/nightly`:
+```
+pipeline {
+    tools {
+        maven 'M3'
+    }
+    agent any
+    stages {
+        stage('Preparation') {
+            steps {
+                git 'https://github.com/chuso/cicd.git'
+            }
+        }
+        stage('Mark as nightly') {
+            steps {
+                sh './markNightly.sh'
+            }
+        }
+        stage('Package') {
+            steps {
+                sh 'mvn package -DskipTests'
+            }
+        }
+        stage('SonarQube analysis') {
+            steps {
+                withSonarQubeEnv(installationName: "LocalSonar") {
+                    sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.6.0.1398:sonar'
+                }
+            }
+        }
+        stage('Unit Test') {
+            steps {
+                sh 'mvn -Dtest=es.codeurjc.anuncios.AnuncioTest test'
+            }
+        }
+        stage('Integration Test') {
+            steps {
+                sh 'mvn -Dtest=es.codeurjc.anuncios.AnunciosControllerTest test'
+            }
+        }
+    }
+    post {
+        always {
+            junit '**/target/surefire-reports/TEST-*.xml'
+        }
+        success {
+            archive 'target/*.jar'
+        }
+    }
+}
+```
+
+Content of `markNightly.sh`:
+
+```
+#!/bin/bash
+sed -i -E "s/<version>(.*)-.*<\/version>/<version>\1-NIGHTLY<\/version>/" pom.xml
+```
+
 ### Release
 
 Finally, we have `jenkins/release`, which is executed manually. In addition, it contains a string parameter, `$TAG`, which updates the tag in the `pom.xml` file. It does the following:
@@ -107,6 +203,67 @@ Finally, we have `jenkins/release`, which is executed manually. In addition, it 
 * Publishes a RELEASE artifact in Nexus.
 
 ![alt text](doc/Nexus_with_Release.png "Nexus with Release")
+
+Content of `jenkins/release`:
+```
+pipeline {
+    tools {
+        maven 'M3'
+    }
+    agent any
+    stages {
+        stage('Preparation') {
+            steps {
+                git 'https://github.com/chuso/cicd.git'
+            }
+        }
+        stage ('Tag repository') {
+            steps {
+                sh './changeTag.sh ${TAG}'
+            }
+        }
+        stage('Package') {
+            steps {
+                sh 'mvn package -DskipTests'
+            }
+        }
+        stage('Unit Test') {
+            steps {
+                sh 'mvn -Dtest=es.codeurjc.anuncios.AnuncioTest test'
+            }
+        }
+        stage('Integration Test') {
+            steps {
+                sh 'mvn -Dtest=es.codeurjc.anuncios.AnunciosControllerTest test'
+            }
+        }
+    }
+    post {
+        always {
+            junit '**/target/surefire-reports/TEST-*.xml'
+        }
+        success {
+            script {
+                def version = sh(
+                    script: "mvn -q -Dexec.executable=\"echo\" -Dexec.args='\${project.version}' --non-recursive org.codehaus.mojo:exec-maven-plugin:1.3.1:exec",
+                    returnStdout: true
+                ).trim()
+                def shortversion = sh(
+                    script: "echo '${version}' | sed 's/-.*//'",
+                    returnStdout: true
+                ).trim()
+                nexusPublisher nexusInstanceId: 'localNexus', nexusRepositoryId: 'mvn-releases', packages: [[$class: 'MavenPackage', mavenAssetList: [[classifier: '', extension: '', filePath: "target/cicd-${version}.jar"]], mavenCoordinate: [artifactId: 'cicd', groupId: 'es.urjc.code', packaging: 'jar', version: "${shortversion}"]]]
+            }
+        }
+    }
+}
+```
+
+Content of `changeTag.sh`:
+```
+#!/bin/sh
+sed -i "s/<version>.*-.*<\/version>/<version>$1<\/version>/" pom.xml
+```
 
 ## Workflow
 

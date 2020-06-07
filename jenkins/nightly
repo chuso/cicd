@@ -11,7 +11,7 @@ pipeline {
         }
         stage('Mark as nightly') {
             steps {
-                sh './markNightly.sh ${TAG}'
+                sh './markNightly.sh'
             }
         }
         stage('Package') {
