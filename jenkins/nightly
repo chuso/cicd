@@ -42,7 +42,7 @@ pipeline {
             junit '**/target/surefire-reports/TEST-*.xml'
         }
         success {
-            archive 'target/*.jar'
+            archive 'target/*NIGHTLY.jar'
         }
     }
 }
