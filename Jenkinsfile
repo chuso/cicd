@@ -34,23 +34,23 @@ pipeline {
                     script: "echo '${version}' | sed 's/-.*//'",
                     returnStdout: true
                 ).trim()
-                nexusPublisher nexusInstanceId: 'localNexus',
-                    nexusRepositoryId: 'mvn-releases',
-                    packages: [[
-                        $class: 'MavenPackage',
-                        mavenAssetList: [[
-                            classifier: '',
-                            extension: '',
-                            filePath: "target/cicd-${version}.jar"
-                        ]],
-                        mavenCoordinate: [
-                            artifactId: 'cicd',
-                            groupId: 'es.urjc.code',
-                            packaging: 'jar',
-                            version: "${shortversion}"
-                        ]
-                    ]]
             }
+            nexusPublisher nexusInstanceId: 'localNexus',
+                nexusRepositoryId: 'mvn-snapshots',
+                packages: [[
+                    $class: 'MavenPackage',
+                    mavenAssetList: [[
+                        classifier: '',
+                        extension: '',
+                        filePath: "target/cicd-0.0.1-SNAPSHOT.jar"
+                    ]],
+                    mavenCoordinate: [
+                        artifactId: 'cicd',
+                        groupId: 'es.urjc.code',
+                        packaging: 'jar',
+                        version: "0.0.1"
+                    ]
+                ]]
         }
     }
 }
