@@ -1,6 +1,6 @@
 # cicd
 
-## Development instructions
+## Development notes
 
 I have used Jenkins locally directly in my host machine (i.e. it is not running under a container).
 
@@ -21,7 +21,7 @@ Once this is done, each repository containing a `Jenkinsfile` will contain a web
 ![alt text](doc/GitHub_jobs_PR.png "GitHub jobs in a Pull Request")
 
 ### Tests suites
-I have been reading how to groups of tests, for example based on paths or on `@Tag()`, so that I can tell Maven which suit to run from the command line. I read about `surefire` and `failsafe`, but it took me so long that, since it's not the goal of the exercises, I ended up using a simpler approach.
+I have been reading how to create groups of tests, for example based on paths or on `@Tag()`, so that I can tell Maven from the command line which tests suit it should run. I read about `surefire` and `failsafe`, but it took me so long that, since it's not the goal of the exercise, I ended up using a simpler approach.
 
 To simulate a _unit-test_ verification:
 
@@ -35,14 +35,16 @@ To simulate an _integration-test_ verification:
 mvn -Dtest=es.codeurjc.anuncios.AnunciosControllerTest test
 ```
 
+The latter creates a docker container and allows to run the test against a real MySQL database.
+
 ### Artifacts Repository
-A new installation of Nexus has been used, with the following repositories: releases repository (`mvn-releases`) and mirror (`mvn-proxy`), gathering all of them in a group  (`mvn-group`).
+A new installation of Nexus has been used with the following repositories: releases repository (`mvn-releases`) and mirror (`mvn-proxy`), gathering both of them in a group  (`mvn-group`).
 
 In addition, Jenkins is now integrated with the local Nexus using the plugin [Nexus Platform](https://plugins.jenkins.io/nexus-jenkins-plugin/). The credentials to connect to the Nexus are stored directly in Jenkins.
 
 ![alt text](doc/Jenkins_with_Nexus.png "Jenkins with Nexus")
 
-This schema -letting Maven publish in Nexus- already provides metadata needed to track which built is associated to a certain artifact. In addition, `git-commit-id-plugin` when building to provide each build with a file `git.properties` with meta info about the commit.
+This schema -letting Maven publish in Nexus- already provides metadata needed to track which built is associated to a certain artifact. In addition, I'm using `git-commit-id-plugin` when building to provide each build with a file `git.properties` with meta info about the commit.
 
 ### Code-Analysis Service
 A SonarQube server has been deployed using docker:
@@ -55,7 +57,7 @@ Then, the plugin [SonarQube Scanner](https://plugins.jenkins.io/sonar/) has been
 
 ![alt text](doc/Jenkins_with_SonarQube.png "Jenkins with SonarQube")
 
-And I've been able to see reports on it:
+And I've been able to send and check reports on it:
 
 ![alt text](doc/SonarQube.png "SonarQube")
 
@@ -73,7 +75,7 @@ There is a default Job, configured in the `Jenkinsfile` file, which is executed 
 
 ### Nightly
 
-There is a second Job, configured in `jenkins/nightly`, that is executed every day at 3am according to the server time-zone. This Job is meant to run heavier tasks than those run by the default one, like integration tests or quality analysis. For the sake of simplicity, this project contains just a single integration test which takes around 1 minute, but let's supose there is a number of integration tests which on average takes half an hour, which would justify having this different job.
+There is a second Job, configured in `jenkins/nightly`, that is executed every day at 3am according to the server time-zone. This Job is meant to run heavier tasks than those run by the default one, like integration tests or quality analysis. For the sake of simplicity, this project contains just a single integration test which takes around 1 minute, but let's suppose there is a number of integration tests which on average takes half an hour, which would justify having this different job.
 
 The cron pattern used to run this every day at 3am local time is:
 
@@ -84,6 +86,7 @@ The cron pattern used to run this every day at 3am local time is:
 This Job does the following:
 
 * Downloads and builds the project.
+* Run SonarQube analysis.
 * Runs unit tests.
 * Runs integration tests.
 * Archives tests results.
@@ -98,3 +101,9 @@ Finally, we have `jenkins/release`, which is executed manually. In addition, it 
 * Runs integration tests.
 * Archives tests results.
 * Publishes a RELEASE artifact in Nexus.
+
+![alt text](doc/Nexus_with_Release.png "Nexus with Release")
+
+## Workflow
+
+This project has taken too long to me, so since I ran out of time, I didn't have the chance to figure out on which workflow it would rely (namely, gitflow, TBD, or any specific variation).
