@@ -44,6 +44,22 @@ In addition, Jenkins is now integrated with the local Nexus using the plugin [Ne
 
 This schema -letting Maven publish in Nexus- already provides metadata needed to track which built is associated to a certain artifact. In addition, `git-commit-id-plugin` when building to provide each build with a file `git.properties` with meta info about the commit.
 
+### Code-Analysis Service
+A SonarQube server has been deployed using docker:
+
+```
+docker run -d --name sonarqube -p 9000:9000 sonarqube
+```
+
+Then, the plugin [SonarQube Scanner](https://plugins.jenkins.io/sonar/) has been installed in Jenkins. The existing SonarQube server has been registered:
+
+![alt text](doc/Jenkins_with_SonarQube.png "Jenkins with SonarQube")
+
+And I've been able to see reports on it:
+
+![alt text](doc/SonarQube.png "SonarQube")
+
+
 ## Jenkins Jobs
 
 ### On push or Pull Request

@@ -19,6 +19,13 @@ pipeline {
                 sh 'mvn package -DskipTests'
             }
         }
+        stage('SonarQube analysis') {
+            steps {
+                withSonarQubeEnv(installationName: "LocalSonar") {
+                    sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.6.0.1398:sonar'
+                }
+            }
+        }
         stage('Unit Test') {
             steps {
                 sh 'mvn -Dtest=es.codeurjc.anuncios.AnuncioTest test'
